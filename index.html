@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indonesian Wordle</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 1rem; }
+    #grid { display: grid; grid-template-columns: repeat(5, 50px); gap: 5px; justify-content: center; margin: 1rem auto; max-width: 100%; }
+    .cell { width: 50px; height: 50px; font-size: 1.5rem; text-transform: uppercase; text-align: center; border: 2px solid #ccc; line-height: 50px; }
+    .correct { background-color: #6aaa64; color: white; }
+    .present { background-color: #c9b458; color: white; }
+    .absent { background-color: #787c7e; color: white; }
+    input, button { font-size: 1.2rem; padding: 0.5rem; margin-top: 1rem; width: 80%; max-width: 300px; }
+    button { margin-left: auto; margin-right: auto; display: block; }
+  </style>
+</head>
+<body>
+  <h1>Indonesian Wordle</h1>
+  <p id="clue"></p>
+  <div id="grid"></div>
+  <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess" />
+  <button onclick="submitGuess()">Guess</button>
+  <p id="message"></p>  <script>
+    const words = [
+      { word: 'hujan', clue: 'rain' },
+      { word: 'air', clue: 'water' },
+      { word: 'matah', clue: 'sun' },
+      { word: 'rumah', clue: 'house' },
+      { word: 'buku', clue: 'book' }
+    ];
+
+    const answer = words[Math.floor(Math.random() * words.length)];
+    document.getElementById("clue").innerText = `Clue: ${answer.clue}`;
+
+    let attempts = 0;
+    const maxAttempts = 6;
+
+    function pronounceWord(word) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'id-ID';
+      for (let i = 0; i < 5; i++) {
+        window.speechSynthesis.speak(utterance.cloneNode());
+      }
+    }
+
+    function submitGuess() {
+      const input = document.getElementById("guessInput");
+      const guess = input.value.toLowerCase();
+      if (guess.length !== answer.word.length) {
+        alert(`Please enter a ${answer.word.length}-letter word.`);
+        return;
+      }
+
+      const grid = document.getElementById("grid");
+      for (let i = 0; i < answer.word.length; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = guess[i];
+        if (guess[i] === answer.word[i]) {
+          cell.classList.add("correct");
+        } else if (answer.word.includes(guess[i])) {
+          cell.classList.add("present");
+        } else {
+          cell.classList.add("absent");
+        }
+        grid.appendChild(cell);
+      }
+      attempts++;
+      input.value = "";
+
+      if (guess === answer.word) {
+        document.getElementById("message").innerText = "You guessed it right!";
+        input.disabled = true;
+        pronounceWord(answer.word);
+      } else if (attempts >= maxAttempts) {
+        document.getElementById("message").innerText = `Game over! The word was '${answer.word}'`;
+        input.disabled = true;
+      }
+    }
+  </script></body>
+</html>
