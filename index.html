@@ -1,27 +1,91 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Indonesian Wordle</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 1rem; }
-    #grid { display: flex; flex-direction: column; gap: 5px; justify-content: center; margin: 1rem auto; max-width: 100%; }
-    .row { display: grid; grid-template-columns: repeat(5, minmax(40px, 1fr)); gap: 5px; justify-content: center; }
-    .cell { aspect-ratio: 1 / 1; font-size: 5vw; max-font-size: 2rem; text-transform: uppercase; text-align: center; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 1rem;
+    }
+    #grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 1rem auto;
+      max-width: 100%;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(40px, 1fr));
+      gap: 5px;
+      justify-content: center;
+    }
+    .cell {
+      aspect-ratio: 1 / 1;
+      font-size: 6vw;
+      max-width: 60px;
+      max-height: 60px;
+      text-transform: uppercase;
+      text-align: center;
+      border: 2px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+    }
     .correct { background-color: #6aaa64; color: white; }
     .present { background-color: #c9b458; color: white; }
-    .absent { background-color: #787c7e; color: white; }
-    input, button { font-size: 1.2rem; padding: 0.5rem; margin-top: 1rem; width: 80%; max-width: 300px; }
-    button { margin-left: auto; margin-right: auto; display: block; }
-    #keyboard { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; justify-content: center; max-width: 600px; margin: 1rem auto; padding: 0 1rem; }
-    .key { padding: 10px; background: #ddd; border: none; border-radius: 5px; font-size: 1.2rem; text-transform: uppercase; cursor: pointer; }
-    .key.correct { background-color: #6aaa64; color: white; }
-    .key.present { background-color: #c9b458; color: white; }
-    .key.absent { background-color: #787c7e; color: white; }
-    @media (max-width: 600px) {
-      .key { padding: 8px; font-size: 1rem; }
-      .cell { font-size: 6vw; }
-    }
+    .absent { background-color: #787c7e; color: white; }input, button {
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  width: 80%;
+  max-width: 300px;
+}
+
+button {
+  display: block;
+  margin: 0.5rem auto;
+}
+
+#keyboard {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  justify-content: center;
+  max-width: 600px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+.key {
+  padding: 10px;
+  background: #ddd;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.key.correct { background-color: #6aaa64; color: white; }
+.key.present { background-color: #c9b458; color: white; }
+.key.absent { background-color: #787c7e; color: white; }
+
+@media (max-width: 600px) {
+  .key { padding: 8px; font-size: 1rem; }
+  .cell { font-size: 8vw; }
+}
+
+#wordList {
+  max-width: 600px;
+  margin: 1rem auto;
+  text-align: left;
+  font-size: 1rem;
+}
+
   </style>
 </head>
 <body>
@@ -31,121 +95,45 @@
   <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess" />
   <button onclick="submitGuess()">Guess</button>
   <div id="keyboard"></div>
-  <p id="message"></p>  <script>
-    const words = [
-      { word: 'hujan', clue: 'rain' },
-      { word: 'air', clue: 'water' },
-      { word: 'matah', clue: 'sun' },
-      { word: 'rumah', clue: 'house' },
-      { word: 'buku', clue: 'book' }
+  <p id="message"></p>  <div id="wordList"></div>  <script>
+    const commonWords = [
+      { word: 'adalah', clue: 'is/are' }, { word: 'dalam', clue: 'in' }, { word: 'tidak', clue: 'not' },
+      { word: 'untuk', clue: 'for' }, { word: 'dengan', clue: 'with' }, { word: 'akan', clue: 'will' },
+      { word: 'pada', clue: 'on/at' }, { word: 'oleh', clue: 'by' }, { word: 'sudah', clue: 'already' },
+      { word: 'karena', clue: 'because' }, { word: 'juga', clue: 'also' }, { word: 'sebagai', clue: 'as' },
+      { word: 'bahwa', clue: 'that' }, { word: 'lebih', clue: 'more' }, { word: 'hanya', clue: 'only' },
+      { word: 'masih', clue: 'still' }, { word: 'setelah', clue: 'after' }, { word: 'orang', clue: 'person' },
+      { word: 'tahun', clue: 'year' }, { word: 'harus', clue: 'must' }, { word: 'waktu', clue: 'time' },
+      { word: 'sebuah', clue: 'a/an' }, { word: 'tersebut', clue: 'mentioned' }, { word: 'kepada', clue: 'to' },
+      { word: 'antara', clue: 'between' }, { word: 'mereka', clue: 'they' }, { word: 'kami', clue: 'we (exclusive)' },
+      { word: 'anda', clue: 'you (formal)' }, { word: 'bisa', clue: 'can' }, { word: 'kemudian', clue: 'then' },
+      { word: 'saya', clue: 'I/me' }, { word: 'itu', clue: 'that' }, { word: 'ini', clue: 'this' },
+      { word: 'dan', clue: 'and' }, { word: 'atau', clue: 'or' }, { word: 'ke', clue: 'to' },
+      { word: 'di', clue: 'in/at' }, { word: 'dari', clue: 'from' }, { word: 'apa', clue: 'what' },
+      { word: 'yang', clue: 'which/that' }, { word: 'siapa', clue: 'who' }, { word: 'mengapa', clue: 'why' },
+      { word: 'bagaimana', clue: 'how' }, { word: 'dimana', clue: 'where' }, { word: 'kapan', clue: 'when' },
+      { word: 'perlu', clue: 'need' }, { word: 'mau', clue: 'want' }, { word: 'lagi', clue: 'again/more' },
+      { word: 'sekarang', clue: 'now' }, { word: 'nanti', clue: 'later' }, { word: 'mungkin', clue: 'maybe' },
+      { word: 'benar', clue: 'true' }, { word: 'salah', clue: 'wrong' }, { word: 'besar', clue: 'big' },
+      { word: 'kecil', clue: 'small' }, { word: 'panjang', clue: 'long' }, { word: 'pendek', clue: 'short' },
+      { word: 'cepat', clue: 'fast' }, { word: 'lambat', clue: 'slow' }, { word: 'mudah', clue: 'easy' },
+      { word: 'sulit', clue: 'difficult' }, { word: 'panas', clue: 'hot' }, { word: 'dingin', clue: 'cold' },
+      { word: 'terang', clue: 'bright' }, { word: 'gelap', clue: 'dark' }, { word: 'baru', clue: 'new' },
+      { word: 'lama', clue: 'old' }, { word: 'baik', clue: 'good' }, { word: 'buruk', clue: 'bad' },
+      { word: 'cantik', clue: 'beautiful' }, { word: 'jelek', clue: 'ugly' }, { word: 'kaya', clue: 'rich' },
+      { word: 'miskin', clue: 'poor' }, { word: 'kuat', clue: 'strong' }, { word: 'lemah', clue: 'weak' },
+      { word: 'pagi', clue: 'morning' }, { word: 'siang', clue: 'afternoon' }, { word: 'malam', clue: 'night' },
+      { word: 'hari', clue: 'day' }, { word: 'minggu', clue: 'week' }, { word: 'bulan', clue: 'month' },
+      { word: 'mata', clue: 'eye' }, { word: 'tangan', clue: 'hand' }, { word: 'kaki', clue: 'leg/foot' },
+      { word: 'kepala', clue: 'head' }, { word: 'hidung', clue: 'nose' }, { word: 'mulut', clue: 'mouth' },
+      { word: 'telinga', clue: 'ear' }, { word: 'rumah', clue: 'house' }, { word: 'mobil', clue: 'car' },
+      { word: 'motor', clue: 'motorbike' }, { word: 'jalan', clue: 'road' }, { word: 'sekolah', clue: 'school' },
+      { word: 'guru', clue: 'teacher' }, { word: 'murid', clue: 'student' }, { word: 'teman', clue: 'friend' },
+      { word: 'keluarga', clue: 'family' }, { word: 'ayah', clue: 'father' }, { word: 'ibu', clue: 'mother' },
+      { word: 'anak', clue: 'child' }, { word: 'laki', clue: 'man' }, { word: 'perempuan', clue: 'woman' }
     ];
 
-    const answer = words[Math.floor(Math.random() * words.length)];
-    document.getElementById("clue").innerText = `Clue: ${answer.clue}`;
-
-    let attempts = 0;
-    const maxAttempts = 6;
-    const keyStatus = {};
-
-    const allKeys = 'abcdefghijklmnopqrstuvwxyz';
-    const keyboard = document.getElementById("keyboard");
-    allKeys.split('').forEach(letter => {
-      const key = document.createElement("button");
-      key.className = "key";
-      key.id = `key-${letter}`;
-      key.innerText = letter;
-      key.onclick = () => addLetter(letter);
-      keyboard.appendChild(key);
-    });
-
-    function updateKeyboard(letter, status) {
-      const key = document.getElementById(`key-${letter}`);
-      if (!key) return;
-
-      const priority = { 'correct': 3, 'present': 2, 'absent': 1 };
-      const current = keyStatus[letter] || 0;
-
-      if (priority[status] > current) {
-        key.classList.remove('correct', 'present', 'absent');
-        key.classList.add(status);
-        keyStatus[letter] = priority[status];
-      }
-    }
-
-    function pronounceWord(word) {
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = 'id-ID';
-      for (let i = 0; i < 5; i++) {
-        window.speechSynthesis.speak(utterance.cloneNode());
-      }
-    }
-
-    function submitGuess() {
-      const input = document.getElementById("guessInput");
-      const guess = input.value.toLowerCase();
-      if (guess.length !== answer.word.length) {
-        alert(`Please enter a ${answer.word.length}-letter word.`);
-        return;
-      }
-
-      const grid = document.getElementById("grid");
-      const row = document.createElement("div");
-      row.classList.add("row");
-
-      for (let i = 0; i < answer.word.length; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.textContent = guess[i];
-
-        if (guess[i] === answer.word[i]) {
-          cell.classList.add("correct");
-          updateKeyboard(guess[i], 'correct');
-        } else if (answer.word.includes(guess[i])) {
-          cell.classList.add("present");
-          updateKeyboard(guess[i], 'present');
-        } else {
-          cell.classList.add("absent");
-          updateKeyboard(guess[i], 'absent');
-        }
-
-        row.appendChild(cell);
-      }
-
-      grid.appendChild(row);
-      attempts++;
-      input.value = "";
-
-      if (guess === answer.word) {
-        document.getElementById("message").innerText = "You guessed it right!";
-        input.disabled = true;
-        pronounceWord(answer.word);
-      } else if (attempts >= maxAttempts) {
-        document.getElementById("message").innerText = `Game over! The word was '${answer.word}'`;
-        input.disabled = true;
-      }
-    }
-
-    function addLetter(letter) {
-      const input = document.getElementById("guessInput");
-      if (input.disabled) return;
-      if (input.value.length < answer.word.length) {
-        input.value += letter;
-      }
-    }
-
-    document.addEventListener("keydown", function(event) {
-      const input = document.getElementById("guessInput");
-      if (input.disabled) return;
-      const key = event.key.toLowerCase();
-      if (key === "enter") {
-        submitGuess();
-      } else if (/^[a-z]$/.test(key)) {
-        if (input.value.length < answer.word.length) {
-          input.value += key;
-        }
-      } else if (key === "backspace") {
-        input.value = input.value.slice(0, -1);
-      }
-    });
+    const wordListDiv = document.getElementById("wordList");
+    wordListDiv.innerHTML = '<h2>Word List:</h2><ul>' + commonWords.map(w => `<li><strong>${w.word}</strong>: ${w.clue}</li>`).join('') + '</ul>';
   </script></body>
 </html>
