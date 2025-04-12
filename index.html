@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,7 +79,9 @@
   <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess">
   <button onclick="submitGuess()">Guess</button>
   <div id="keyboard"></div>
-  <p id="message"></p>  <script>
+  <p id="message"></p>
+
+  <script>
     const commonWords = [
       { word: 'adalah', clue: 'is/are' }, { word: 'dalam', clue: 'in' }, { word: 'tidak', clue: 'not' },
       { word: 'untuk', clue: 'for' }, { word: 'dengan', clue: 'with' }, { word: 'akan', clue: 'will' },
@@ -96,6 +99,8 @@
       { word: 'yang', clue: 'which/that' }, { word: 'siapa', clue: 'who' }, { word: 'mengapa', clue: 'why' },
       { word: 'bagaimana', clue: 'how' }, { word: 'dimana', clue: 'where' }, { word: 'kapan', clue: 'when' }
     ];
+
+    const dictionary = new Set(commonWords.map(w => w.word.slice(0, 5)));
 
     const grid = document.getElementById("grid");
     const clue = document.getElementById("clue");
@@ -140,6 +145,10 @@
     function submitGuess() {
       const guess = guessInput.value.toLowerCase().slice(0, 5);
       if (guess.length < 5 || currentRow >= maxGuesses) return;
+      if (!dictionary.has(guess)) {
+        message.textContent = 'Not a valid Indonesian word.';
+        return;
+      }
 
       const row = grid.children[currentRow];
       const guessArr = guess.split("");
@@ -185,5 +194,6 @@
     guessInput.addEventListener("keyup", (e) => {
       if (e.key === "Enter") submitGuess();
     });
-  </script></body>
+  </script>
+</body>
 </html>
