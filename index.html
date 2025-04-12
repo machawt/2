@@ -5,13 +5,19 @@
   <title>Indonesian Wordle</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin: 1rem; }
-    #grid { display: grid; grid-template-columns: repeat(5, 50px); gap: 5px; justify-content: center; margin: 1rem auto; max-width: 100%; }
+    #grid { display: flex; flex-direction: column; gap: 5px; justify-content: center; margin: 1rem auto; max-width: 100%; }
+    .row { display: grid; grid-template-columns: repeat(5, 50px); gap: 5px; justify-content: center; }
     .cell { width: 50px; height: 50px; font-size: 1.5rem; text-transform: uppercase; text-align: center; border: 2px solid #ccc; line-height: 50px; }
     .correct { background-color: #6aaa64; color: white; }
     .present { background-color: #c9b458; color: white; }
     .absent { background-color: #787c7e; color: white; }
     input, button { font-size: 1.2rem; padding: 0.5rem; margin-top: 1rem; width: 80%; max-width: 300px; }
     button { margin-left: auto; margin-right: auto; display: block; }
+    #keyboard { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; justify-content: center; max-width: 500px; margin: 1rem auto; }
+    .key { padding: 10px; background: #ddd; border: none; border-radius: 5px; font-size: 1rem; text-transform: uppercase; cursor: default; }
+    .key.correct { background-color: #6aaa64; color: white; }
+    .key.present { background-color: #c9b458; color: white; }
+    .key.absent { background-color: #787c7e; color: white; }
   </style>
 </head>
 <body>
@@ -20,6 +26,7 @@
   <div id="grid"></div>
   <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess" />
   <button onclick="submitGuess()">Guess</button>
+  <div id="keyboard"></div>
   <p id="message"></p>  <script>
     const words = [
       { word: 'hujan', clue: 'rain' },
@@ -34,6 +41,31 @@
 
     let attempts = 0;
     const maxAttempts = 6;
+    const keyStatus = {};
+
+    const allKeys = 'abcdefghijklmnopqrstuvwxyz';
+    const keyboard = document.getElementById("keyboard");
+    allKeys.split('').forEach(letter => {
+      const key = document.createElement("button");
+      key.className = "key";
+      key.id = `key-${letter}`;
+      key.innerText = letter;
+      keyboard.appendChild(key);
+    });
+
+    function updateKeyboard(letter, status) {
+      const key = document.getElementById(`key-${letter}`);
+      if (!key) return;
+
+      const priority = { 'correct': 3, 'present': 2, 'absent': 1 };
+      const current = keyStatus[letter] || 0;
+
+      if (priority[status] > current) {
+        key.classList.remove('correct', 'present', 'absent');
+        key.classList.add(status);
+        keyStatus[letter] = priority[status];
+      }
+    }
 
     function pronounceWord(word) {
       const utterance = new SpeechSynthesisUtterance(word);
@@ -52,19 +84,29 @@
       }
 
       const grid = document.getElementById("grid");
+      const row = document.createElement("div");
+      row.classList.add("row");
+
       for (let i = 0; i < answer.word.length; i++) {
         const cell = document.createElement("div");
         cell.classList.add("cell");
         cell.textContent = guess[i];
+
         if (guess[i] === answer.word[i]) {
           cell.classList.add("correct");
+          updateKeyboard(guess[i], 'correct');
         } else if (answer.word.includes(guess[i])) {
           cell.classList.add("present");
+          updateKeyboard(guess[i], 'present');
         } else {
           cell.classList.add("absent");
+          updateKeyboard(guess[i], 'absent');
         }
-        grid.appendChild(cell);
+
+        row.appendChild(cell);
       }
+
+      grid.appendChild(row);
       attempts++;
       input.value = "";
 
@@ -77,5 +119,20 @@
         input.disabled = true;
       }
     }
+
+    document.addEventListener("keydown", function(event) {
+      const input = document.getElementById("guessInput");
+      if (input.disabled) return;
+      const key = event.key.toLowerCase();
+      if (key === "enter") {
+        submitGuess();
+      } else if (/^[a-z]$/.test(key)) {
+        if (input.value.length < answer.word.length) {
+          input.value += key;
+        }
+      } else if (key === "backspace") {
+        input.value = input.value.slice(0, -1);
+      }
+    });
   </script></body>
 </html>
