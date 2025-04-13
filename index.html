@@ -144,9 +144,8 @@
 
     function submitGuess() {
       const guess = guessInput.value.toLowerCase().slice(0, 5);
-      if (guess.length < 5 || currentRow >= maxGuesses) return;
-      if (!dictionary.has(guess)) {
-        message.textContent = 'Not a valid Indonesian word.';
+      if (guess.length < 5 || currentRow >= maxGuesses) 
+      return;
         return;
       }
 
