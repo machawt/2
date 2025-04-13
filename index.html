@@ -144,9 +144,9 @@
 
     function submitGuess() {
       const guess = guessInput.value.toLowerCase().slice(0, 5);
-      if (guess.length < 5 || currentRow >= maxGuesses) 
+      if (guess.length < 5 || currentRow >= maxGuesses);
       return;
-        return;
+        
       }
 
       const row = grid.children[currentRow];
