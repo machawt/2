@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indonesian Numbers Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .cell {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 4vw;
+      transition: background-color 0.3s;
+      border-radius: 8px;
+    }
+    .cell.correct {
+      background-color: #90ee90;
+      border-color: #4caf50;
+    }
+    .cell.wrong {
+      background-color: #ffcccb;
+      border-color: #f44336;
+    }
+    @media (min-width: 600px) {
+      .cell {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" id="grid"></div>  <script>
+    const indonesianNumbers = [
+      "satu", "dua", "tiga", "empat",
+      "lima", "enam", "tujuh", "delapan",
+      "sembilan", "sepuluh", "sebelas", "dua belas",
+      "tiga belas", "empat belas", "lima belas", "enam belas"
+    ];
+
+    const shuffled = [...indonesianNumbers]
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+
+    const grid = document.getElementById("grid");
+    let current = 0;
+
+    shuffled.forEach((word) => {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.textContent = word;
+
+      cell.addEventListener("click", () => {
+        if (word === indonesianNumbers[current]) {
+          cell.classList.add("correct");
+          current++;
+          if (current === indonesianNumbers.length) {
+            alert("Selamat! You completed the sequence!");
+          }
+        } else {
+          cell.classList.add("wrong");
+          setTimeout(() => cell.classList.remove("wrong"), 500);
+        }
+      });
+
+      grid.appendChild(cell);
+    });
+  </script></body>
+</html>
