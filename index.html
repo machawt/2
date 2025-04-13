@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+love<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -114,7 +114,7 @@
     const word = wordEntry.word.toLowerCase().slice(0, 5);
     clue.textContent = `Clue: ${wordEntry.clue}`;
 
-    for (let i = 0; i < maxGuesses; i++) {
+    for (let i = 0; i < maxGuesses+1; i++) {
       const row = document.createElement("div");
       row.className = "row";
       for (let j = 0; j < 5; j++) {
